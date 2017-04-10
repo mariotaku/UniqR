@@ -1,0 +1,6 @@
+rootProject.name = 'UniqR'
+include 'core'
+include 'sample.javase'
+include 'javase'
+include 'android'
+

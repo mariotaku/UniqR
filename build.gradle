@@ -1,0 +1,16 @@
+subprojects {
+    group 'com.github.mariotaku.UniqR'
+    version '0.9'
+
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    sourceCompatibility = JavaVersion.VERSION_1_7
+    targetCompatibility = JavaVersion.VERSION_1_7
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+    }
+}
