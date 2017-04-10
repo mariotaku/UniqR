@@ -8,7 +8,6 @@ import org.mariotaku.uniqr.UniqR;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,14 +16,12 @@ import java.util.List;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        final BufferedImage background = ImageIO.read(new File("nyan_sakamoto.png"));
+        final BufferedImage background = ImageIO.read(Main.class.getResource("nyan_sakamoto.png"));
         final List<QrSegment> qrSegments = QrSegment.makeSegments("Hello world, UniqR!");
         final QrCode qrCode = QrCode.encodeSegments(qrSegments, QrCode.Ecc.HIGH, 5, 40, -1, true);
 
         UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), background, new QrCodeData(qrCode));
         uniqR.setQrPatternColor(0xFF003366);
-        uniqR.setScale(4);
-        uniqR.setDotSize(2);
         showImage(uniqR.build().produceResult(), "Image");
     }
 
