@@ -1,5 +1,7 @@
 package org.mariotaku.uniqr;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -7,18 +9,21 @@ import java.awt.image.BufferedImage;
  * Created by mariotaku on 2017/4/10.
  */
 public class JavaSEPlatform implements Platform<BufferedImage> {
+    @NotNull
     @Override
     public Canvas<BufferedImage> createImage(int width, int height) {
         return createImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
     }
 
+    @NotNull
     @Override
-    public Canvas<BufferedImage> createImage(BufferedImage input) {
+    public Canvas<BufferedImage> createImage(@NotNull BufferedImage input) {
         return new JavaSECanvas(input);
     }
 
+    @NotNull
     @Override
-    public Canvas<BufferedImage> createScaled(BufferedImage input, int width, int height) {
+    public Canvas<BufferedImage> createScaled(@NotNull BufferedImage input, int width, int height) {
         final Image scaled = input.getScaledInstance(width, height, Image.SCALE_DEFAULT);
         // Create a buffered image with transparency
         final BufferedImage buffered = new BufferedImage(scaled.getWidth(null),
@@ -59,6 +64,7 @@ public class JavaSEPlatform implements Platform<BufferedImage> {
             wrapped.setRGB(x, y, pixel);
         }
 
+        @NotNull
         @Override
         public BufferedImage produceResult() {
             return wrapped;

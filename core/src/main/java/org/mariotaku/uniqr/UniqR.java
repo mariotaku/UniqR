@@ -1,12 +1,16 @@
 package org.mariotaku.uniqr;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
+ * UniqR core class
  * Created by mariotaku on 2017/4/9.
  */
 public class UniqR<T> {
 
     private static final int POSITION_PATTERN_SIZE = 8;
     private static final int POSITION_PATTERN_CONTENT_SIZE = 7;
+
     private static final boolean[][] POSITION_PATTERN_CONTENT = {
             {true, true, true, true, true, true, true},
             {true, false, false, false, false, false, true},
@@ -25,14 +29,17 @@ public class UniqR<T> {
             {true, true, true, true, true},
     };
 
+    @NotNull
     private final Platform<T> platform;
+    @NotNull
     private final T background;
+    @NotNull
     private final QrData qrData;
     private int scale = 3;
     private int dotSize = 1;
     private int qrBackgroundColor = 0xFFFFFFFF, qrPatternColor = 0xFF000000;
 
-    public UniqR(Platform<T> platform, T background, QrData qrData) {
+    public UniqR(@NotNull Platform<T> platform, @NotNull T background, @NotNull QrData qrData) {
         this.platform = platform;
         this.background = background;
         this.qrData = qrData;
@@ -71,6 +78,7 @@ public class UniqR<T> {
         this.dotSize = dotSize;
     }
 
+    @NotNull
     public Canvas<T> build() {
         final int imageSize = qrData.getSize() * scale;
         // Draw background
@@ -89,7 +97,7 @@ public class UniqR<T> {
         return result;
     }
 
-    private void drawDot(Canvas<T> target, int x, int y, int color) {
+    private void drawDot(@NotNull Canvas<T> target, int x, int y, int color) {
         for (int j = x; j < x + dotSize; j++) {
             for (int k = y; k < y + dotSize; k++) {
                 target.setPixel(j, k, color);
@@ -97,7 +105,7 @@ public class UniqR<T> {
         }
     }
 
-    private void drawFunctionPatterns(Canvas<T> target) {
+    private void drawFunctionPatterns(@NotNull Canvas<T> target) {
         // Draw 3 position patterns (all corners except bottom right; overwrites some timing modules)
         // Top left
         drawPositionPattern(target, 0, 0, false, false);
@@ -119,7 +127,7 @@ public class UniqR<T> {
         }
     }
 
-    private void drawPositionPattern(Canvas<T> target, int qrX, int qrY, boolean padX, boolean padY) {
+    private void drawPositionPattern(@NotNull Canvas<T> target, int qrX, int qrY, boolean padX, boolean padY) {
         final int patternOffsetX = padX ? 1 : 0, patternOffsetY = padY ? 1 : 0;
         final int l = qrX * scale, t = qrY * scale, r = l + POSITION_PATTERN_SIZE * scale,
                 b = t + POSITION_PATTERN_SIZE * scale;
@@ -134,7 +142,7 @@ public class UniqR<T> {
 
     }
 
-    private void drawAlignmentPattern(Canvas<T> target, int qrX, int qrY) {
+    private void drawAlignmentPattern(@NotNull Canvas<T> target, int qrX, int qrY) {
         final int l = qrX * scale, t = qrY * scale, r = l + 5 * scale, b = t + 5 * scale;
         for (int x = l; x < r; x++) {
             for (int y = t; y < b; y++) {
@@ -149,6 +157,7 @@ public class UniqR<T> {
     // Returns a set of positions of the alignment patterns in ascending order. These positions are
     // used on both the x and y axes. Each value in the resulting array is in the range [0, 177).
     // This stateless pure function could be implemented as table of 40 variable-length lists of unsigned bytes.
+    @NotNull
     private static int[] getAlignmentPatternPositions(int ver) {
         if (ver < 1 || ver > 40) throw new IllegalArgumentException("Version number out of range");
         if (ver == 1) return new int[0];

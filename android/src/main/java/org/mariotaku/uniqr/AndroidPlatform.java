@@ -2,24 +2,28 @@ package org.mariotaku.uniqr;
 
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by mariotaku on 2017/4/10.
  */
 public class AndroidPlatform implements Platform<Bitmap> {
 
+    @NotNull
     @Override
     public Canvas<Bitmap> createImage(int width, int height) {
         return createImage(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888));
     }
 
+    @NotNull
     @Override
-    public Canvas<Bitmap> createImage(Bitmap input) {
+    public Canvas<Bitmap> createImage(@NotNull Bitmap input) {
         return new AndroidBitmapCanvas(input);
     }
 
+    @NotNull
     @Override
-    public Canvas<Bitmap> createScaled(Bitmap input, int width, int height) {
+    public Canvas<Bitmap> createScaled(@NotNull Bitmap input, int width, int height) {
         final int dimension = Math.min(width, height);
         final Bitmap scaled = ThumbnailUtils.extractThumbnail(input, dimension, dimension);
         return createImage(scaled);
@@ -52,6 +56,7 @@ public class AndroidPlatform implements Platform<Bitmap> {
             bitmap.setPixel(x, y, pixel);
         }
 
+        @NotNull
         @Override
         public Bitmap produceResult() {
             return bitmap;
