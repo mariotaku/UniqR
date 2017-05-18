@@ -1,28 +1,28 @@
-import io.nayuki.qrcodegen.QrCode;
+import com.google.zxing.qrcode.encoder.QRCode;
 import org.mariotaku.uniqr.QrData;
 
 /**
  * Created by mariotaku on 2017/4/10.
  */
 public class QrCodeData implements QrData {
-    private QrCode qrCode;
+    private QRCode qrCode;
 
-    QrCodeData(QrCode qrCode) {
+    QrCodeData(QRCode qrCode) {
         this.qrCode = qrCode;
     }
 
     @Override
     public int getSize() {
-        return qrCode.size;
+        return qrCode.getVersion().getDimensionForVersion();
     }
 
     @Override
     public int getVersion() {
-        return qrCode.version;
+        return qrCode.getVersion().getVersionNumber();
     }
 
     @Override
     public boolean get(int x, int y) {
-        return qrCode.getModule(x, y) == 1;
+        return qrCode.getMatrix().get(x, y) == 1;
     }
 }

@@ -159,20 +159,24 @@ public class UniqR<T> {
     // This stateless pure function could be implemented as table of 40 variable-length lists of unsigned bytes.
     @NotNull
     private static int[] getAlignmentPatternPositions(int ver) {
-        if (ver < 1 || ver > 40) throw new IllegalArgumentException("Version number out of range");
-        if (ver == 1) return new int[0];
-        int numAlign = ver / 7 + 2;
-        int step;
-        if (ver != 32)
-            step = (ver * 4 + numAlign * 2 + 1) / (2 * numAlign - 2) * 2;  // ceil((size - 13) / (2*numAlign - 2)) * 2
-        else  // C-C-C-Combo breaker!
-            step = 26;
+        if (ver < 1 || ver > 40)
+            throw new IllegalArgumentException("Version number out of range");
+        else if (ver == 1)
+            return new int[]{};
+        else {
+            int numAlign = ver / 7 + 2;
+            int step;
+            if (ver != 32)
+                step = (ver * 4 + numAlign * 2 + 1) / (2 * numAlign - 2) * 2;  // ceil((size - 13) / (2*numAlign - 2)) * 2
+            else  // C-C-C-Combo breaker!
+                step = 26;
 
-        int[] result = new int[numAlign];
-        int size = ver * 4 + 17;
-        result[0] = 6;
-        for (int i = result.length - 1, pos = size - 9; i >= 1; i--, pos -= step)
-            result[i] = pos;
-        return result;
+            int[] result = new int[numAlign];
+            int size = ver * 4 + 17;
+            result[0] = 6;
+            for (int i = result.length - 1, pos = size - 7; i >= 1; i--, pos -= step)
+                result[i] = pos;
+            return result;
+        }
     }
 }

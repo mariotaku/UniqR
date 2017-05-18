@@ -1,25 +1,28 @@
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.google.zxing.qrcode.encoder.Encoder;
+import com.google.zxing.qrcode.encoder.QRCode;
 import hu.kazocsaba.imageviewer.ImageViewer;
 import hu.kazocsaba.imageviewer.ResizeStrategy;
-import io.nayuki.qrcodegen.QrCode;
-import io.nayuki.qrcodegen.QrSegment;
 import org.mariotaku.uniqr.JavaSEPlatform;
 import org.mariotaku.uniqr.UniqR;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by mariotaku on 2017/4/9.
  */
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         final BufferedImage background = ImageIO.read(Main.class.getResource("nyan_sakamoto.png"));
-        final List<QrSegment> qrSegments = QrSegment.makeSegments("Hello world, UniqR!");
-        final QrCode qrCode = QrCode.encodeSegments(qrSegments, QrCode.Ecc.HIGH, 5, 40, -1, true);
 
+        Map<EncodeHintType, Object> hints = new HashMap<>();
+        hints.put(EncodeHintType.QR_VERSION, 5);
+        QRCode qrCode = Encoder.encode("Hello world, UniqR!", ErrorCorrectionLevel.H, hints);
         UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), background, new QrCodeData(qrCode));
         uniqR.setQrPatternColor(0xFF003366);
         showImage(uniqR.build().produceResult(), "Image");
