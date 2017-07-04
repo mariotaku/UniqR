@@ -10,6 +10,8 @@ public class UniqR<T> {
 
     private static final int POSITION_PATTERN_SIZE = 8;
     private static final int POSITION_PATTERN_CONTENT_SIZE = 7;
+    private static final int ALIGNMENT_PATTERN_SIZE = 7;
+    private static final int ALIGNMENT_PATTERN_CONTENT_SIZE = 5;
 
     private static final boolean[][] POSITION_PATTERN_CONTENT = {
             {true, true, true, true, true, true, true},
@@ -143,11 +145,14 @@ public class UniqR<T> {
     }
 
     private void drawAlignmentPattern(@NotNull Canvas<T> target, int qrX, int qrY) {
-        final int l = qrX * scale, t = qrY * scale, r = l + 5 * scale, b = t + 5 * scale;
+        final int patternOffsetX = 1, patternOffsetY = 1;
+        final int l = (qrX - 1) * scale, t = (qrY - 1) * scale, r = l + ALIGNMENT_PATTERN_SIZE * scale,
+                b = t + ALIGNMENT_PATTERN_SIZE * scale;
         for (int x = l; x < r; x++) {
             for (int y = t; y < b; y++) {
-                final int row = (y - t) / scale, col = (x - l) / scale;
-                boolean dot = ALIGNMENT_PATTERN[row][col];
+                final int row = (y - t) / scale - patternOffsetY, col = (x - l) / scale - patternOffsetX;
+                boolean dot = row >= 0 && row < ALIGNMENT_PATTERN_CONTENT_SIZE && col >= 0 &&
+                        col < ALIGNMENT_PATTERN_CONTENT_SIZE && ALIGNMENT_PATTERN[row][col];
                 target.setPixel(x, y, dot ? qrPatternColor : qrBackgroundColor);
             }
         }
