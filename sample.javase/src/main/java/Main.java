@@ -25,6 +25,7 @@ public class Main {
         QRCode qrCode = Encoder.encode("Hello world, UniqR!", ErrorCorrectionLevel.H, hints);
         UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), background, new QrCodeData(qrCode));
         uniqR.setQrPatternColor(0xFF003366);
+        uniqR.setScale(3);
         showImage(uniqR.build().produceResult(), "Image");
     }
 

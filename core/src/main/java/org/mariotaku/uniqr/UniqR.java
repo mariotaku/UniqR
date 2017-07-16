@@ -1,6 +1,7 @@
 package org.mariotaku.uniqr;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * UniqR core class
@@ -10,7 +11,7 @@ public class UniqR<T> {
 
     private static final int POSITION_PATTERN_SIZE = 8;
     private static final int POSITION_PATTERN_CONTENT_SIZE = 7;
-    private static final int ALIGNMENT_PATTERN_SIZE = 7;
+    private static final int ALIGNMENT_PATTERN_SIZE = 5;
     private static final int ALIGNMENT_PATTERN_CONTENT_SIZE = 5;
 
     private static final boolean[][] POSITION_PATTERN_CONTENT = {
@@ -33,18 +34,20 @@ public class UniqR<T> {
 
     @NotNull
     private final Platform<T> platform;
-    @NotNull
+    @Nullable
     private final T background;
     @NotNull
     private final QrData qrData;
-    private int scale = 3;
-    private int dotSize = 1;
+    private int scale;
+    private int dotSize;
     private int qrBackgroundColor = 0xFFFFFFFF, qrPatternColor = 0xFF000000;
 
-    public UniqR(@NotNull Platform<T> platform, @NotNull T background, @NotNull QrData qrData) {
+    public UniqR(@NotNull Platform<T> platform, @Nullable T background, @NotNull QrData qrData) {
         this.platform = platform;
         this.background = background;
         this.qrData = qrData;
+        setScale(3);
+        setDotSize(1);
     }
 
     public int getScale() {
@@ -54,6 +57,9 @@ public class UniqR<T> {
     public void setScale(int scale) {
         if (scale < 3) throw new IllegalArgumentException("Scale must be >= 3");
         this.scale = scale;
+        if (this.background == null) {
+            this.setDotSize(scale);
+        }
     }
 
     public int getQrBackgroundColor() {
@@ -77,6 +83,7 @@ public class UniqR<T> {
     }
 
     public void setDotSize(int dotSize) {
+        if (background == null) return;
         this.dotSize = dotSize;
     }
 
@@ -84,7 +91,12 @@ public class UniqR<T> {
     public Canvas<T> build() {
         final int imageSize = qrData.getSize() * scale;
         // Draw background
-        Canvas<T> result = platform.createScaled(background, imageSize, imageSize);
+        Canvas<T> result;
+        if (background == null) {
+            result = platform.createImage(imageSize, imageSize);
+        } else {
+            result = platform.createScaled(background, imageSize, imageSize);
+        }
         // Draw QR code dots
         final int dotPos = (scale - dotSize) / 2;
         for (int x = 0; x < imageSize; x++) {
@@ -123,8 +135,9 @@ public class UniqR<T> {
             for (int j = 0; j < numAlign; j++) {
                 if (i == 0 && j == 0 || i == 0 && j == numAlign - 1 || i == numAlign - 1 && j == 0)
                     continue;  // Skip the three position corners
-                else
-                    drawAlignmentPattern(target, alignPatPos[i], alignPatPos[j]);
+
+                drawAlignmentPattern(target, alignPatPos[i] - ALIGNMENT_PATTERN_SIZE / 2,
+                        alignPatPos[j] - ALIGNMENT_PATTERN_SIZE / 2);
             }
         }
     }
@@ -145,9 +158,10 @@ public class UniqR<T> {
     }
 
     private void drawAlignmentPattern(@NotNull Canvas<T> target, int qrX, int qrY) {
-        final int patternOffsetX = 1, patternOffsetY = 1;
-        final int l = (qrX - 1) * scale, t = (qrY - 1) * scale, r = l + ALIGNMENT_PATTERN_SIZE * scale,
-                b = t + ALIGNMENT_PATTERN_SIZE * scale;
+        final int patternOffsetX = (ALIGNMENT_PATTERN_SIZE - ALIGNMENT_PATTERN_CONTENT_SIZE) / 2,
+                patternOffsetY = (ALIGNMENT_PATTERN_SIZE - ALIGNMENT_PATTERN_CONTENT_SIZE) / 2;
+        final int l = (qrX - patternOffsetX) * scale, t = (qrY - patternOffsetY) * scale,
+                r = l + ALIGNMENT_PATTERN_SIZE * scale, b = t + ALIGNMENT_PATTERN_SIZE * scale;
         for (int x = l; x < r; x++) {
             for (int y = t; y < b; y++) {
                 final int row = (y - t) / scale - patternOffsetY, col = (x - l) / scale - patternOffsetX;
