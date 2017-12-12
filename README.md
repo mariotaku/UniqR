@@ -14,7 +14,6 @@ Yet another QR art library for Java, combines image with QR code.
 * No QR encoder bundled for flexibility, you'll need to implement `QrData` classes with your favorite QR encoder
 * You'll need to crop and adjust input image by yourself (especially for JavaSE implementation).
  For example, an image with aspect ratio other than 1:1 may be stretched.
-* There's no padding for output image, you'll need to add by yourself.
 
 ## Example (in Kotlin)
 
