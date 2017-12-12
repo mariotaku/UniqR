@@ -14,6 +14,6 @@ public interface Platform<T> {
     Canvas<T> createImage(@NotNull T input);
 
     @NotNull
-    Canvas<T> createScaled(@NotNull T input, int width, int height);
+    Canvas<T> createScaled(@NotNull T input, int width, int height, int padding, int backgroundColor);
 
 }

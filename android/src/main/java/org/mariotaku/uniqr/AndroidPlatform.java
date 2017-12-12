@@ -23,9 +23,14 @@ public class AndroidPlatform implements Platform<Bitmap> {
 
     @NotNull
     @Override
-    public Canvas<Bitmap> createScaled(@NotNull Bitmap input, int width, int height) {
-        final int dimension = Math.min(width, height);
-        final Bitmap scaled = ThumbnailUtils.extractThumbnail(input, dimension, dimension);
+    public Canvas<Bitmap> createScaled(@NotNull Bitmap input, int width, int height, int padding, int backgroundColor) {
+        final int dimension = Math.min(width - padding * 2, height - padding * 2);
+        final Bitmap thumb = ThumbnailUtils.extractThumbnail(input, dimension, dimension);
+        Bitmap scaled = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        android.graphics.Canvas canvas = new android.graphics.Canvas(scaled);
+        canvas.drawColor(backgroundColor);
+        canvas.drawBitmap(thumb, padding, padding, null);
+        thumb.recycle();
         return createImage(scaled);
     }
 

@@ -26,6 +26,7 @@ public class Main {
         UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), background, new QrCodeData(qrCode));
         uniqR.setQrPatternColor(0xFF003366);
         uniqR.setScale(3);
+        uniqR.setPadding(100);
         showImage(uniqR.build().produceResult(), "Image");
     }
 

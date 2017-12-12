@@ -23,14 +23,14 @@ public class JavaSEPlatform implements Platform<BufferedImage> {
 
     @NotNull
     @Override
-    public Canvas<BufferedImage> createScaled(@NotNull BufferedImage input, int width, int height) {
-        final Image scaled = input.getScaledInstance(width, height, Image.SCALE_DEFAULT);
+    public Canvas<BufferedImage> createScaled(@NotNull BufferedImage input, int width, int height, int padding, int qrBackgroundColor) {
+        final Image scaled = input.getScaledInstance(width - padding * 2, height - padding * 2, Image.SCALE_DEFAULT);
         // Create a buffered image with transparency
-        final BufferedImage buffered = new BufferedImage(scaled.getWidth(null),
-                scaled.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         // Draw the image on to the buffered image
         Graphics2D bGr = buffered.createGraphics();
-        bGr.drawImage(scaled, 0, 0, null);
+        bGr.setBackground(new Color(qrBackgroundColor, true));
+        bGr.drawImage(scaled, padding, padding, null);
         bGr.dispose();
         scaled.flush();
         return createImage(buffered);

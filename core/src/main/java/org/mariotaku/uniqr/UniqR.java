@@ -40,6 +40,7 @@ public class UniqR<T> {
     private final QrData qrData;
     private int scale;
     private int dotSize;
+    private int padding;
     private int qrBackgroundColor = 0xFFFFFFFF, qrPatternColor = 0xFF000000;
 
     public UniqR(@NotNull Platform<T> platform, @Nullable T background, @NotNull QrData qrData) {
@@ -60,6 +61,14 @@ public class UniqR<T> {
         if (this.background == null) {
             this.setDotSize(scale);
         }
+    }
+
+    public int getPadding() {
+        return padding;
+    }
+
+    public void setPadding(int padding) {
+        this.padding = padding;
     }
 
     public int getQrBackgroundColor() {
@@ -89,21 +98,22 @@ public class UniqR<T> {
 
     @NotNull
     public Canvas<T> build() {
-        final int imageSize = qrData.getSize() * scale;
+        final int contentSize = qrData.getSize() * scale;
+        final int outputSize = contentSize + padding * 2;
         // Draw background
         Canvas<T> result;
         if (background == null) {
-            result = platform.createImage(imageSize, imageSize);
+            result = platform.createImage(outputSize, outputSize);
         } else {
-            result = platform.createScaled(background, imageSize, imageSize);
+            result = platform.createScaled(background, outputSize, outputSize, padding, qrBackgroundColor);
         }
         // Draw QR code dots
         final int dotPos = (scale - dotSize) / 2;
-        for (int x = 0; x < imageSize; x++) {
-            for (int y = 0; y < imageSize; y++) {
+        for (int x = 0; x < contentSize; x++) {
+            for (int y = 0; y < contentSize; y++) {
                 if (x % scale != dotPos || y % scale != dotPos) continue;
                 final int row = y / scale, col = x / scale;
-                drawDot(result, x, y, qrData.get(col, row) ? qrPatternColor : qrBackgroundColor);
+                drawDot(result, x + padding, y + padding, qrData.get(col, row) ? qrPatternColor : qrBackgroundColor);
             }
         }
         // Draw function patterns
@@ -151,7 +161,7 @@ public class UniqR<T> {
                 final int row = (y - t) / scale - patternOffsetY, col = (x - l) / scale - patternOffsetX;
                 boolean dot = row >= 0 && row < POSITION_PATTERN_CONTENT_SIZE && col >= 0 &&
                         col < POSITION_PATTERN_CONTENT_SIZE && POSITION_PATTERN_CONTENT[row][col];
-                target.setPixel(x, y, dot ? qrPatternColor : qrBackgroundColor);
+                target.setPixel(x + padding, y + padding, dot ? qrPatternColor : qrBackgroundColor);
             }
         }
 
@@ -167,7 +177,7 @@ public class UniqR<T> {
                 final int row = (y - t) / scale - patternOffsetY, col = (x - l) / scale - patternOffsetX;
                 boolean dot = row >= 0 && row < ALIGNMENT_PATTERN_CONTENT_SIZE && col >= 0 &&
                         col < ALIGNMENT_PATTERN_CONTENT_SIZE && ALIGNMENT_PATTERN[row][col];
-                target.setPixel(x, y, dot ? qrPatternColor : qrBackgroundColor);
+                target.setPixel(x + padding, y + padding, dot ? qrPatternColor : qrBackgroundColor);
             }
         }
     }
