@@ -1,6 +1,6 @@
 subprojects {
     group 'com.github.mariotaku.UniqR'
-    version '0.9.5'
+    version '0.9.6'
 
     apply plugin: 'java'
     apply plugin: 'maven'
