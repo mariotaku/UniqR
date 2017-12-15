@@ -11,14 +11,13 @@ import java.awt.image.BufferedImage;
 public class JavaSEPlatform implements Platform<BufferedImage> {
     @NotNull
     @Override
-    public Canvas<BufferedImage> createImage(int width, int height) {
-        return createImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB));
-    }
-
-    @NotNull
-    @Override
-    public Canvas<BufferedImage> createImage(@NotNull BufferedImage input) {
-        return new JavaSECanvas(input);
+    public Canvas<BufferedImage> createImage(int width, int height, int padding, int qrBackgroundColor) {
+        final BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        // Draw the image on to the buffered image
+        Graphics2D bGr = buffered.createGraphics();
+        bGr.setBackground(new Color(qrBackgroundColor, true));
+        bGr.dispose();
+        return new JavaSECanvas(buffered);
     }
 
     @NotNull
@@ -33,7 +32,7 @@ public class JavaSEPlatform implements Platform<BufferedImage> {
         bGr.drawImage(scaled, padding, padding, null);
         bGr.dispose();
         scaled.flush();
-        return createImage(buffered);
+        return new JavaSECanvas(buffered);
     }
 
     static class JavaSECanvas implements Canvas<BufferedImage> {

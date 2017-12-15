@@ -8,10 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public interface Platform<T> {
 
     @NotNull
-    Canvas<T> createImage(int width, int height);
-
-    @NotNull
-    Canvas<T> createImage(@NotNull T input);
+    Canvas<T> createImage(int width, int height, int padding, int backgroundColor);
 
     @NotNull
     Canvas<T> createScaled(@NotNull T input, int width, int height, int padding, int backgroundColor);

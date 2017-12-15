@@ -88,6 +88,7 @@ public class UniqR<T> {
     }
 
     public int getDotSize() {
+        if (background == null) return scale;
         return dotSize;
     }
 
@@ -103,11 +104,12 @@ public class UniqR<T> {
         // Draw background
         Canvas<T> result;
         if (background == null) {
-            result = platform.createImage(outputSize, outputSize);
+            result = platform.createImage(outputSize, outputSize, padding, qrBackgroundColor);
         } else {
             result = platform.createScaled(background, outputSize, outputSize, padding, qrBackgroundColor);
         }
         // Draw QR code dots
+        final int dotSize = getDotSize();
         final int dotPos = (scale - dotSize) / 2;
         for (int x = 0; x < contentSize; x++) {
             for (int y = 0; y < contentSize; y++) {
@@ -122,6 +124,7 @@ public class UniqR<T> {
     }
 
     private void drawDot(@NotNull Canvas<T> target, int x, int y, int color) {
+        final int dotSize = getDotSize();
         for (int j = x; j < x + dotSize; j++) {
             for (int k = y; k < y + dotSize; k++) {
                 target.setPixel(j, k, color);

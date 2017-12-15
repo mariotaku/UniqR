@@ -11,14 +11,11 @@ public class AndroidPlatform implements Platform<Bitmap> {
 
     @NotNull
     @Override
-    public Canvas<Bitmap> createImage(int width, int height) {
-        return createImage(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888));
-    }
-
-    @NotNull
-    @Override
-    public Canvas<Bitmap> createImage(@NotNull Bitmap input) {
-        return new AndroidBitmapCanvas(input);
+    public Canvas<Bitmap> createImage(int width, int height, int padding, int backgroundColor) {
+        final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        android.graphics.Canvas canvas = new android.graphics.Canvas(bitmap);
+        canvas.drawColor(backgroundColor);
+        return new AndroidBitmapCanvas(bitmap);
     }
 
     @NotNull
@@ -31,7 +28,7 @@ public class AndroidPlatform implements Platform<Bitmap> {
         canvas.drawColor(backgroundColor);
         canvas.drawBitmap(thumb, padding, padding, null);
         thumb.recycle();
-        return createImage(scaled);
+        return new AndroidBitmapCanvas(scaled);
     }
 
     static class AndroidBitmapCanvas implements Canvas<Bitmap> {
