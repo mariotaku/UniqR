@@ -23,10 +23,12 @@ public class Main {
         Map<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.QR_VERSION, 5);
         QRCode qrCode = Encoder.encode("Hello world, UniqR!", ErrorCorrectionLevel.H, hints);
-        UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), background, new QrCodeData(qrCode));
+        UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), null, new QrCodeData(qrCode));
+        uniqR.setQrBackgroundColor(0xFF00FF00);
         uniqR.setQrPatternColor(0xFF003366);
+        uniqR.setQrFunctionPatternBackgroundColor(0xFFFF0000);
         uniqR.setScale(3);
-        uniqR.setPadding(100);
+        uniqR.setPadding(1);
         showImage(uniqR.build().produceResult(), "Image");
     }
 

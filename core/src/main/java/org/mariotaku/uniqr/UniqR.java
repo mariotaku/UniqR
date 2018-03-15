@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class UniqR<T> {
 
-    private static final int POSITION_PATTERN_SIZE = 8;
+    private static final int POSITION_PATTERN_SIZE = 9;
     private static final int POSITION_PATTERN_CONTENT_SIZE = 7;
     private static final int ALIGNMENT_PATTERN_SIZE = 5;
     private static final int ALIGNMENT_PATTERN_CONTENT_SIZE = 5;
@@ -41,7 +41,10 @@ public class UniqR<T> {
     private int scale;
     private int dotSize;
     private int padding;
-    private int qrBackgroundColor = 0xFFFFFFFF, qrPatternColor = 0xFF000000;
+    private int qrBackgroundColor = 0xFFFFFFFF;
+    private int qrFunctionPatternBackgroundColor = 0xFFFFFFFF;
+    private int qrPatternColor = 0xFF000000;
+    private boolean qrFunctionPatternBackgroundColorSet = false;
 
     public UniqR(@NotNull Platform<T> platform, @Nullable T background, @NotNull QrData qrData) {
         this.platform = platform;
@@ -76,6 +79,16 @@ public class UniqR<T> {
         this.qrBackgroundColor = color;
     }
 
+    public int getQrFunctionPatternBackgroundColor() {
+        if (!qrFunctionPatternBackgroundColorSet) return getQrBackgroundColor();
+        return qrFunctionPatternBackgroundColor;
+    }
+
+    public void setQrFunctionPatternBackgroundColor(int color) {
+        this.qrFunctionPatternBackgroundColorSet = true;
+        this.qrFunctionPatternBackgroundColor = color;
+    }
+
     public int getQrPatternColor() {
         return qrPatternColor;
     }
@@ -94,14 +107,15 @@ public class UniqR<T> {
 
     @NotNull
     public Canvas<T> build() {
+        final int backgroundColor = getQrBackgroundColor();
         final int contentSize = qrData.getSize() * scale;
         final int outputSize = contentSize + padding * 2;
         // Draw background
         Canvas<T> result;
         if (background == null) {
-            result = platform.createImage(outputSize, outputSize, padding, qrBackgroundColor);
+            result = platform.createImage(outputSize, outputSize, padding, backgroundColor);
         } else {
-            result = platform.createScaled(background, outputSize, outputSize, padding, qrBackgroundColor);
+            result = platform.createScaled(background, outputSize, outputSize, padding, backgroundColor);
         }
         // Draw QR code dots
         final int dotSize = getDotSize();
@@ -110,7 +124,7 @@ public class UniqR<T> {
             for (int y = 0; y < contentSize; y++) {
                 if (x % scale != dotPos || y % scale != dotPos) continue;
                 final int row = y / scale, col = x / scale;
-                drawDot(result, x + padding, y + padding, qrData.get(col, row) ? qrPatternColor : qrBackgroundColor);
+                drawDot(result, x + padding, y + padding, qrData.get(col, row) ? qrPatternColor : backgroundColor);
             }
         }
         // Draw function patterns
@@ -130,11 +144,11 @@ public class UniqR<T> {
     private void drawFunctionPatterns(@NotNull Canvas<T> target) {
         // Draw 3 position patterns (all corners except bottom right; overwrites some timing modules)
         // Top left
-        drawPositionPattern(target, 0, 0, false, false);
+        drawPositionPattern(target, 0, 0);
         // Top right
-        drawPositionPattern(target, qrData.getSize() - POSITION_PATTERN_SIZE, 0, true, false);
+        drawPositionPattern(target, qrData.getSize() - POSITION_PATTERN_CONTENT_SIZE, 0);
         // Bottom left
-        drawPositionPattern(target, 0, qrData.getSize() - POSITION_PATTERN_SIZE, false, true);
+        drawPositionPattern(target, 0, qrData.getSize() - POSITION_PATTERN_CONTENT_SIZE);
 
         // Draw the numerous alignment patterns
         int[] alignPatPos = getAlignmentPatternPositions(qrData.getVersion());
@@ -150,32 +164,41 @@ public class UniqR<T> {
         }
     }
 
-    private void drawPositionPattern(@NotNull Canvas<T> target, int qrX, int qrY, boolean padX, boolean padY) {
-        final int patternOffsetX = padX ? 1 : 0, patternOffsetY = padY ? 1 : 0;
-        final int l = qrX * scale, t = qrY * scale, r = l + POSITION_PATTERN_SIZE * scale,
-                b = t + POSITION_PATTERN_SIZE * scale;
-        for (int x = l; x < r; x++) {
-            for (int y = t; y < b; y++) {
-                final int row = (y - t) / scale - patternOffsetY, col = (x - l) / scale - patternOffsetX;
-                boolean dot = row >= 0 && row < POSITION_PATTERN_CONTENT_SIZE && col >= 0 &&
-                        col < POSITION_PATTERN_CONTENT_SIZE && POSITION_PATTERN_CONTENT[row][col];
-                target.setPixel(x + padding, y + padding, dot ? qrPatternColor : qrBackgroundColor);
+    private void drawPositionPattern(@NotNull Canvas<T> target, int qrX, int qrY) {
+        final int patternPad = (POSITION_PATTERN_SIZE - POSITION_PATTERN_CONTENT_SIZE) / 2;
+        final int patternColor = this.getQrPatternColor();
+        final int patternBackgroundColor = getQrFunctionPatternBackgroundColor();
+        for (int x = 0; x < POSITION_PATTERN_SIZE; x++) {
+            for (int y = 0; y < POSITION_PATTERN_SIZE; y++) {
+                final int row = x - patternPad, col = y - patternPad;
+                if (row < 0 || col < 0 || row >= POSITION_PATTERN_CONTENT_SIZE || col >= POSITION_PATTERN_CONTENT_SIZE) {
+                    target.drawDot(padding + (qrX + row) * scale, padding + (qrY + col) * scale, scale,
+                            patternBackgroundColor);
+                } else {
+                    boolean dot = POSITION_PATTERN_CONTENT[row][col];
+                    target.drawDot(padding + (qrX + row) * scale, padding + (qrY + col) * scale, scale,
+                            dot ? patternColor : patternBackgroundColor);
+                }
             }
         }
 
     }
 
     private void drawAlignmentPattern(@NotNull Canvas<T> target, int qrX, int qrY) {
-        final int patternOffsetX = (ALIGNMENT_PATTERN_SIZE - ALIGNMENT_PATTERN_CONTENT_SIZE) / 2,
-                patternOffsetY = (ALIGNMENT_PATTERN_SIZE - ALIGNMENT_PATTERN_CONTENT_SIZE) / 2;
-        final int l = (qrX - patternOffsetX) * scale, t = (qrY - patternOffsetY) * scale,
-                r = l + ALIGNMENT_PATTERN_SIZE * scale, b = t + ALIGNMENT_PATTERN_SIZE * scale;
-        for (int x = l; x < r; x++) {
-            for (int y = t; y < b; y++) {
-                final int row = (y - t) / scale - patternOffsetY, col = (x - l) / scale - patternOffsetX;
-                boolean dot = row >= 0 && row < ALIGNMENT_PATTERN_CONTENT_SIZE && col >= 0 &&
-                        col < ALIGNMENT_PATTERN_CONTENT_SIZE && ALIGNMENT_PATTERN[row][col];
-                target.setPixel(x + padding, y + padding, dot ? qrPatternColor : qrBackgroundColor);
+        final int patternPad = (ALIGNMENT_PATTERN_SIZE - ALIGNMENT_PATTERN_CONTENT_SIZE) / 2;
+        final int patternColor = this.getQrPatternColor();
+        final int patternBackgroundColor = getQrFunctionPatternBackgroundColor();
+        for (int x = 0; x < ALIGNMENT_PATTERN_SIZE; x++) {
+            for (int y = 0; y < ALIGNMENT_PATTERN_SIZE; y++) {
+                final int row = x - patternPad, col = y - patternPad;
+                if (row < 0 || col < 0 || row >= ALIGNMENT_PATTERN_CONTENT_SIZE || col >= ALIGNMENT_PATTERN_CONTENT_SIZE) {
+                    target.drawDot(padding + (qrX + row) * scale, padding + (qrY + col) * scale, scale,
+                            patternBackgroundColor);
+                } else {
+                    boolean dot = ALIGNMENT_PATTERN[row][col];
+                    target.drawDot(padding + (qrX + row) * scale, padding + (qrY + col) * scale, scale,
+                            dot ? patternColor : patternBackgroundColor);
+                }
             }
         }
     }

@@ -54,13 +54,19 @@ public class JavaSEPlatform implements Platform<BufferedImage> {
         }
 
         @Override
-        public int getPixel(int x, int y) {
-            return wrapped.getRGB(x, y);
+        public void setPixel(int x, int y, int pixel) {
+            wrapped.setRGB(x, y, pixel);
         }
 
         @Override
-        public void setPixel(int x, int y, int pixel) {
-            wrapped.setRGB(x, y, pixel);
+        public void drawDot(int l, int t, int size, int color) {
+            final int width = wrapped.getWidth(), height = wrapped.getHeight();
+            for (int x = l; x < l + size; x++) {
+                for (int y = t; y < t + size; y++) {
+                    if (x < 0 || y < 0 || x >= width || y >= height) continue;
+                    wrapped.setRGB(x, y, color);
+                }
+            }
         }
 
         @NotNull
