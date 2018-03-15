@@ -138,21 +138,13 @@ public class UniqR<T> {
             for (int y = 0; y < contentSize; y++) {
                 if (x % scale != dotPos || y % scale != dotPos) continue;
                 final int row = y / scale, col = x / scale;
-                drawDot(result, x + padding, y + padding, qrData.get(col, row) ? qrPatternColor : qrEmptyPatternColor);
+                result.drawDot(x + padding, y + padding, dotSize,
+                        qrData.get(col, row) ? qrPatternColor : qrEmptyPatternColor);
             }
         }
         // Draw function patterns
         drawFunctionPatterns(result);
         return result;
-    }
-
-    private void drawDot(@NotNull Canvas<T> target, int x, int y, int color) {
-        final int dotSize = getDotSize();
-        for (int j = x; j < x + dotSize; j++) {
-            for (int k = y; k < y + dotSize; k++) {
-                target.drawDot(j, k, dotSize, color);
-            }
-        }
     }
 
     private void drawFunctionPatterns(@NotNull Canvas<T> target) {
