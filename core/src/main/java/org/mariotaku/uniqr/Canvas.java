@@ -10,8 +10,6 @@ public interface Canvas<T> {
 
     int getHeight();
 
-    void setPixel(int x, int y, int pixel);
-
     void drawDot(int l, int t, int size, int color);
 
     @NotNull

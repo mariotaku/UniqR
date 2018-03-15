@@ -44,7 +44,9 @@ public class UniqR<T> {
     private int qrBackgroundColor = 0xFFFFFFFF;
     private int qrFunctionPatternBackgroundColor = 0xFFFFFFFF;
     private int qrPatternColor = 0xFF000000;
+    private int qrEmptyPatternColor = 0xFFFFFFFF;
     private boolean qrFunctionPatternBackgroundColorSet = false;
+    private boolean qrEmptyPatternColorSet = false;
 
     public UniqR(@NotNull Platform<T> platform, @Nullable T background, @NotNull QrData qrData) {
         this.platform = platform;
@@ -97,6 +99,16 @@ public class UniqR<T> {
         this.qrPatternColor = color;
     }
 
+    public int getQrEmptyPatternColor() {
+        if (!qrEmptyPatternColorSet) return getQrBackgroundColor();
+        return qrEmptyPatternColor;
+    }
+
+    public void setQrEmptyPatternColor(int qrEmptyPatternColor) {
+        this.qrEmptyPatternColorSet = true;
+        this.qrEmptyPatternColor = qrEmptyPatternColor;
+    }
+
     public int getDotSize() {
         return dotSize;
     }
@@ -108,6 +120,8 @@ public class UniqR<T> {
     @NotNull
     public Canvas<T> build() {
         final int backgroundColor = getQrBackgroundColor();
+        final int qrPatternColor = getQrPatternColor();
+        final int qrEmptyPatternColor = getQrEmptyPatternColor();
         final int contentSize = qrData.getSize() * scale;
         final int outputSize = contentSize + padding * 2;
         // Draw background
@@ -124,7 +138,7 @@ public class UniqR<T> {
             for (int y = 0; y < contentSize; y++) {
                 if (x % scale != dotPos || y % scale != dotPos) continue;
                 final int row = y / scale, col = x / scale;
-                drawDot(result, x + padding, y + padding, qrData.get(col, row) ? qrPatternColor : backgroundColor);
+                drawDot(result, x + padding, y + padding, qrData.get(col, row) ? qrPatternColor : qrEmptyPatternColor);
             }
         }
         // Draw function patterns
@@ -136,7 +150,7 @@ public class UniqR<T> {
         final int dotSize = getDotSize();
         for (int j = x; j < x + dotSize; j++) {
             for (int k = y; k < y + dotSize; k++) {
-                target.setPixel(j, k, color);
+                target.drawDot(j, k, dotSize, color);
             }
         }
     }

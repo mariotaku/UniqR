@@ -15,8 +15,10 @@ public class JavaSEPlatform implements Platform<BufferedImage> {
         final BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         // Draw the image on to the buffered image
         Graphics2D bGr = buffered.createGraphics();
-        bGr.setBackground(new Color(qrBackgroundColor, true));
+        bGr.setColor(new Color(qrBackgroundColor, true));
+        bGr.fillRect(0, 0, buffered.getWidth(), buffered.getHeight());
         bGr.dispose();
+        buffered.flush();
         return new JavaSECanvas(buffered);
     }
 
@@ -28,7 +30,8 @@ public class JavaSEPlatform implements Platform<BufferedImage> {
         final BufferedImage buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         // Draw the image on to the buffered image
         Graphics2D bGr = buffered.createGraphics();
-        bGr.setBackground(new Color(qrBackgroundColor, true));
+        bGr.setColor(new Color(qrBackgroundColor, true));
+        bGr.fillRect(0, 0, buffered.getWidth(), buffered.getHeight());
         bGr.drawImage(scaled, padding, padding, null);
         bGr.dispose();
         scaled.flush();
@@ -51,11 +54,6 @@ public class JavaSEPlatform implements Platform<BufferedImage> {
         @Override
         public int getHeight() {
             return wrapped.getHeight();
-        }
-
-        @Override
-        public void setPixel(int x, int y, int pixel) {
-            wrapped.setRGB(x, y, pixel);
         }
 
         @Override

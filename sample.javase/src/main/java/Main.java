@@ -21,14 +21,15 @@ public class Main {
         final BufferedImage background = ImageIO.read(Main.class.getResource("nyan_sakamoto.png"));
 
         Map<EncodeHintType, Object> hints = new HashMap<>();
-        hints.put(EncodeHintType.QR_VERSION, 5);
+        hints.put(EncodeHintType.QR_VERSION, 9);
         QRCode qrCode = Encoder.encode("Hello world, UniqR!", ErrorCorrectionLevel.H, hints);
-        UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), null, new QrCodeData(qrCode));
-        uniqR.setQrBackgroundColor(0xFF00FF00);
+        UniqR<BufferedImage> uniqR = new UniqR<>(new JavaSEPlatform(), background, new QrCodeData(qrCode));
+        uniqR.setQrBackgroundColor(0x000000);
         uniqR.setQrPatternColor(0xFF003366);
-        uniqR.setQrFunctionPatternBackgroundColor(0xFFFF0000);
-        uniqR.setScale(3);
-        uniqR.setPadding(1);
+        uniqR.setQrFunctionPatternBackgroundColor(0xFFFFFFFF);
+        uniqR.setDotSize(2);
+        uniqR.setScale(8);
+        uniqR.setPadding(30);
         showImage(uniqR.build().produceResult(), "Image");
     }
 

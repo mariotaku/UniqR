@@ -49,11 +49,6 @@ public class AndroidPlatform implements Platform<Bitmap> {
         }
 
         @Override
-        public void setPixel(int x, int y, int pixel) {
-            bitmap.setPixel(x, y, pixel);
-        }
-
-        @Override
         public void drawDot(int l, int t, int size, int color) {
             final int width = bitmap.getWidth(), height = bitmap.getHeight();
             for (int x = l; x < l + size; x++) {
