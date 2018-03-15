@@ -58,9 +58,6 @@ public class UniqR<T> {
     public void setScale(int scale) {
         if (scale < 3) throw new IllegalArgumentException("Scale must be >= 3");
         this.scale = scale;
-        if (this.background == null) {
-            this.setDotSize(scale);
-        }
     }
 
     public int getPadding() {
@@ -88,12 +85,10 @@ public class UniqR<T> {
     }
 
     public int getDotSize() {
-        if (background == null) return scale;
         return dotSize;
     }
 
     public void setDotSize(int dotSize) {
-        if (background == null) return;
         this.dotSize = dotSize;
     }
 
